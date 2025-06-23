@@ -42,15 +42,14 @@ export function Header() {
     if (searchQuery.trim()) {
       router.push("/products");
       setIsSearchOpen(false);
+      setIsMobileMenuOpen(false);
     }
   };
 
   const navigation = [
     { name: "Home", href: "/" },
     { name: "Products", href: "/products" },
-    { name: "Categories", href: "/products" },
-    // { name: 'About', href: '/about' },
-    // { name: 'Contact', href: '/contact' },
+    { name: "Categories", href: "/categories" },
   ];
 
   return (
@@ -114,7 +113,7 @@ export function Header() {
                 {totalItems > 0 && (
                   <Badge
                     variant="destructive"
-                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs"
+                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
                   >
                     {totalItems}
                   </Badge>
@@ -218,6 +217,66 @@ export function Header() {
                     {item.name}
                   </Link>
                 ))}
+                
+                {/* Mobile-only actions */}
+                <div className="pt-4 border-t space-y-2">
+                  <Link
+                    href="/cart"
+                    className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Cart {totalItems > 0 && `(${totalItems})`}
+                  </Link>
+                  
+                  <Link
+                    href="#"
+                    className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Heart className="h-4 w-4 mr-2" />
+                    Wishlist
+                  </Link>
+                  
+                  {isAuthenticated ? (
+                    <>
+                      <Link
+                        href="/account"
+                        className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <User className="h-4 w-4 mr-2" />
+                        My Account
+                      </Link>
+                      <button
+                        onClick={() => {
+                          signOut();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full text-left"
+                      >
+                        Sign Out
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/auth/login"
+                        className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Sign In
+                      </Link>
+                      <Link
+                        href="/auth/register"
+                        className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Sign Up
+                      </Link>
+                    </>
+                  )}
+                </div>
               </nav>
             </motion.div>
           )}
