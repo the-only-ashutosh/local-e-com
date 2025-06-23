@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   creator: 'ModernShop',
   publisher: 'ModernShop',
   robots: 'index, follow',
+
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -24,11 +25,12 @@ export const metadata: Metadata = {
     description: 'Discover premium products with exceptional quality and service.',
     siteName: 'ModernShop',
   },
+
   twitter: {
     card: 'summary_large_image',
     title: 'ModernShop - Premium E-Commerce Experience',
     description: 'Discover premium products with exceptional quality and service.',
-  },
+  }
 };
 
 export default function RootLayout({
