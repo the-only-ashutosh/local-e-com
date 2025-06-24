@@ -1,50 +1,50 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { ArrowRight, Truck, Shield, RefreshCw, Award } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ProductCard } from '@/components/product-card';
-import { featuredProducts, saleProducts, categories } from '@/lib/data';
+import { motion } from "framer-motion";
+import { ArrowRight, Truck, Shield, RefreshCw, Award } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ProductCard } from "@/components/product-card";
+import { featuredProducts, saleProducts, categories } from "@/lib/data";
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1 }
-  }
+    transition: { staggerChildren: 0.1 },
+  },
 };
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 }
+  visible: { opacity: 1, y: 0 },
 };
 
 export default function HomePage() {
   const features = [
     {
       icon: Truck,
-      title: 'Free Shipping',
-      description: 'Free shipping on orders over $50'
+      title: "Free Shipping",
+      description: "Free shipping on orders over $50",
     },
     {
       icon: Shield,
-      title: 'Secure Payment',
-      description: '100% secure payment processing'
+      title: "Secure Payment",
+      description: "100% secure payment processing",
     },
     {
       icon: RefreshCw,
-      title: 'Easy Returns',
-      description: '30-day hassle-free returns'
+      title: "Easy Returns",
+      description: "30-day hassle-free returns",
     },
     {
       icon: Award,
-      title: 'Quality Guarantee',
-      description: 'Premium quality products only'
-    }
+      title: "Quality Guarantee",
+      description: "Premium quality products only",
+    },
   ];
 
   return (
@@ -61,7 +61,7 @@ export default function HomePage() {
           />
           <div className="absolute inset-0 bg-black/40" />
         </div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -69,11 +69,12 @@ export default function HomePage() {
           className="relative z-10 text-center text-white max-w-4xl mx-auto px-4"
         >
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Discover Premium
+            {"Discover Premium"}
             <span className="text-primary"> Products</span>
           </h1>
           <p className="text-lg md:text-xl mb-8 text-gray-200">
-            Experience exceptional quality and service with our curated collection of modern products
+            Experience exceptional quality and service with our curated
+            collection of modern products
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" asChild>
@@ -83,9 +84,7 @@ export default function HomePage() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="/categories">
-                Browse Categories
-              </Link>
+              <Link href="/categories">Browse Categories</Link>
             </Button>
           </div>
         </motion.div>
@@ -106,7 +105,9 @@ export default function HomePage() {
                 <CardContent className="p-6">
                   <feature.icon className="h-12 w-12 mx-auto mb-4 text-primary" />
                   <h3 className="font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -124,7 +125,8 @@ export default function HomePage() {
         >
           <h2 className="text-3xl font-bold mb-4">Featured Products</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Discover our hand-picked selection of premium products that combine quality, style, and innovation
+            Discover our hand-picked selection of premium products that combine
+            quality, style, and innovation
           </p>
         </motion.div>
 
@@ -167,7 +169,9 @@ export default function HomePage() {
               </Badge>
               <h2 className="text-3xl font-bold mb-4">Special Deals</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Don't miss out on these amazing deals. Limited time offers on selected premium products
+                {
+                  "Don't miss out on these amazing deals. Limited time offers on selected premium products"
+                }
               </p>
             </motion.div>
 
@@ -198,7 +202,9 @@ export default function HomePage() {
         >
           <h2 className="text-3xl font-bold mb-4">Shop by Category</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Explore our diverse range of categories to find exactly what you're looking for
+            {
+              "Explore our diverse range of categories to find exactly what you're looking for"
+            }
           </p>
         </motion.div>
 
@@ -235,7 +241,8 @@ export default function HomePage() {
           >
             <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
             <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-              Subscribe to our newsletter and be the first to know about new products, exclusive deals, and special offers
+              Subscribe to our newsletter and be the first to know about new
+              products, exclusive deals, and special offers
             </p>
             <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
               <input
@@ -243,9 +250,7 @@ export default function HomePage() {
                 placeholder="Enter your email"
                 className="flex-1 px-4 py-3 rounded-lg text-foreground"
               />
-              <Button variant="secondary">
-                Subscribe
-              </Button>
+              <Button variant="secondary">Subscribe</Button>
             </div>
           </motion.div>
         </div>

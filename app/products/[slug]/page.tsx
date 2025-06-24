@@ -1,31 +1,31 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useParams } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { 
-  Star, 
-  Heart, 
-  ShoppingCart, 
-  Minus, 
-  Plus, 
+import { useState } from "react";
+import { useParams } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  Star,
+  Heart,
+  ShoppingCart,
+  Minus,
+  Plus,
   ArrowLeft,
   Truck,
   Shield,
   RefreshCw,
-  Share2
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useCartStore } from '@/lib/store';
-import { products } from '@/lib/data';
-import { formatPrice, calculateDiscount } from '@/lib/utils';
-import { toast } from 'sonner';
+  Share2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useCartStore } from "@/lib/store";
+import { products } from "@/lib/data";
+import { formatPrice, calculateDiscount } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -35,7 +35,7 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const { addItem } = useCartStore();
 
-  const product = products.find(p => p.slug === slug);
+  const product = products.find((p) => p.slug === slug);
 
   if (!product) {
     return (
@@ -48,9 +48,10 @@ export default function ProductDetailPage() {
     );
   }
 
-  const discount = product.sale && product.originalPrice 
-    ? calculateDiscount(product.originalPrice, product.price)
-    : 0;
+  const discount =
+    product.sale && product.originalPrice
+      ? calculateDiscount(product.originalPrice, product.price)
+      : 0;
 
   const handleAddToCart = () => {
     addItem(product, quantity);
@@ -59,27 +60,34 @@ export default function ProductDetailPage() {
 
   const handleWishlist = () => {
     setIsWishlisted(!isWishlisted);
-    toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
+    toast.success(isWishlisted ? "Removed from wishlist" : "Added to wishlist");
   };
 
   // Mock additional images for gallery
   const images = [product.image, product.image, product.image];
 
   const features = [
-    { icon: Truck, text: 'Free shipping on orders over $50' },
-    { icon: Shield, text: '2-year warranty included' },
-    { icon: RefreshCw, text: '30-day return policy' },
+    { icon: Truck, text: "Free shipping on orders over $50" },
+    { icon: Shield, text: "2-year warranty included" },
+    { icon: RefreshCw, text: "30-day return policy" },
   ];
 
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb */}
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-8">
-        <Link href="/" className="hover:text-foreground">Home</Link>
+        <Link href="/" className="hover:text-foreground">
+          Home
+        </Link>
         <span>/</span>
-        <Link href="/products" className="hover:text-foreground">Products</Link>
+        <Link href="/products" className="hover:text-foreground">
+          Products
+        </Link>
         <span>/</span>
-        <Link href={`/products?category=${encodeURIComponent(product.category)}`} className="hover:text-foreground">
+        <Link
+          href={`/products?category=${encodeURIComponent(product.category)}`}
+          className="hover:text-foreground"
+        >
           {product.category}
         </Link>
         <span>/</span>
@@ -103,15 +111,17 @@ export default function ProductDetailPage() {
               </Badge>
             )}
           </div>
-          
+
           {/* Thumbnail Gallery */}
           <div className="flex space-x-2">
             {images.map((image, index) => (
               <button
-                key={index}
+                key={index + "sgj,bs"}
                 onClick={() => setSelectedImage(index)}
                 className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 ${
-                  selectedImage === index ? 'border-primary' : 'border-transparent'
+                  selectedImage === index
+                    ? "border-primary"
+                    : "border-transparent"
                 }`}
               >
                 <Image
@@ -132,17 +142,17 @@ export default function ProductDetailPage() {
               {product.category}
             </p>
             <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
-            
+
             {/* Rating */}
             <div className="flex items-center gap-2 mb-4">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
                   <Star
-                    key={i}
+                    key={i + "kjsfx"}
                     className={`h-4 w-4 ${
                       i < Math.floor(product.rating)
-                        ? 'fill-current text-yellow-400'
-                        : 'text-gray-300'
+                        ? "fill-current text-yellow-400"
+                        : "text-gray-300"
                     }`}
                   />
                 ))}
@@ -154,7 +164,9 @@ export default function ProductDetailPage() {
 
             {/* Price */}
             <div className="flex items-center gap-3 mb-6">
-              <span className="text-3xl font-bold">{formatPrice(product.price)}</span>
+              <span className="text-3xl font-bold">
+                {formatPrice(product.price)}
+              </span>
               {product.originalPrice && (
                 <span className="text-xl text-muted-foreground line-through">
                   {formatPrice(product.originalPrice)}
@@ -211,7 +223,11 @@ export default function ProductDetailPage() {
                 onClick={handleWishlist}
                 className="px-4"
               >
-                <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current text-red-500' : ''}`} />
+                <Heart
+                  className={`h-5 w-5 ${
+                    isWishlisted ? "fill-current text-red-500" : ""
+                  }`}
+                />
               </Button>
               <Button variant="outline" size="lg" className="px-4">
                 <Share2 className="h-5 w-5" />
@@ -224,7 +240,7 @@ export default function ProductDetailPage() {
           {/* Features */}
           <div className="space-y-3">
             {features.map((feature, index) => (
-              <div key={index} className="flex items-center gap-3">
+              <div key={index + "ryfblj"} className="flex items-center gap-3">
                 <feature.icon className="h-5 w-5 text-primary" />
                 <span className="text-sm">{feature.text}</span>
               </div>
@@ -241,7 +257,7 @@ export default function ProductDetailPage() {
             <TabsTrigger value="specifications">Specifications</TabsTrigger>
             <TabsTrigger value="reviews">Reviews</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="description" className="mt-6">
             <Card>
               <CardContent className="p-6">
@@ -249,9 +265,9 @@ export default function ProductDetailPage() {
                 <div className="prose max-w-none">
                   <p className="mb-4">{product.description}</p>
                   <p className="mb-4">
-                    This premium product is crafted with attention to detail and built to last. 
+                    {`This premium product is crafted with attention to detail and built to last. 
                     Whether you're looking for functionality, style, or both, this item delivers 
-                    exceptional value and performance.
+                    exceptional value and performance.`}
                   </p>
                   <ul className="list-disc pl-6 space-y-1">
                     <li>High-quality materials and construction</li>
@@ -263,7 +279,7 @@ export default function ProductDetailPage() {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="specifications" className="mt-6">
             <Card>
               <CardContent className="p-6">
@@ -271,15 +287,21 @@ export default function ProductDetailPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <dt className="font-medium">Category</dt>
-                    <dd className="text-muted-foreground">{product.category}</dd>
+                    <dd className="text-muted-foreground">
+                      {product.category}
+                    </dd>
                   </div>
                   <div>
                     <dt className="font-medium">Rating</dt>
-                    <dd className="text-muted-foreground">{product.rating}/5 stars</dd>
+                    <dd className="text-muted-foreground">
+                      {product.rating}/5 stars
+                    </dd>
                   </div>
                   <div>
                     <dt className="font-medium">Reviews</dt>
-                    <dd className="text-muted-foreground">{product.reviewCount} customer reviews</dd>
+                    <dd className="text-muted-foreground">
+                      {product.reviewCount} customer reviews
+                    </dd>
                   </div>
                   <div>
                     <dt className="font-medium">Availability</dt>
@@ -289,7 +311,7 @@ export default function ProductDetailPage() {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="reviews" className="mt-6">
             <Card>
               <CardContent className="p-6">
@@ -302,16 +324,18 @@ export default function ProductDetailPage() {
                         <div className="flex items-center">
                           {[...Array(5)].map((_, i) => (
                             <Star
-                              key={i}
+                              key={i + "jlcnv."}
                               className="h-4 w-4 fill-current text-yellow-400"
                             />
                           ))}
                         </div>
                         <span className="font-medium">John D.</span>
-                        <span className="text-sm text-muted-foreground">2 days ago</span>
+                        <span className="text-sm text-muted-foreground">
+                          2 days ago
+                        </span>
                       </div>
                       <p className="text-muted-foreground">
-                        Great product! Exactly as described and arrived quickly. 
+                        Great product! Exactly as described and arrived quickly.
                         Would definitely recommend to others.
                       </p>
                     </div>
@@ -328,7 +352,9 @@ export default function ProductDetailPage() {
         <h2 className="text-2xl font-bold mb-8">Related Products</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {products
-            .filter(p => p.category === product.category && p.id !== product.id)
+            .filter(
+              (p) => p.category === product.category && p.id !== product.id
+            )
             .slice(0, 4)
             .map((relatedProduct) => (
               <Card key={relatedProduct.id} className="group overflow-hidden">
@@ -345,7 +371,9 @@ export default function ProductDetailPage() {
                     <h3 className="font-semibold line-clamp-2 mb-2">
                       {relatedProduct.name}
                     </h3>
-                    <p className="font-bold">{formatPrice(relatedProduct.price)}</p>
+                    <p className="font-bold">
+                      {formatPrice(relatedProduct.price)}
+                    </p>
                   </CardContent>
                 </Link>
               </Card>

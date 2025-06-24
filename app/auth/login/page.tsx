@@ -1,26 +1,32 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { auth, googleProvider, facebookProvider } from '@/lib/firebase';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { auth, googleProvider, facebookProvider } from "@/lib/firebase";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,10 +35,10 @@ export default function LoginPage() {
 
     try {
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      toast.success('Welcome back!');
-      router.push('/');
+      toast.success("Welcome back!");
+      router.push("/");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to sign in');
+      toast.error(error.message || "Failed to sign in");
     } finally {
       setIsLoading(false);
     }
@@ -42,10 +48,10 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
-      toast.success('Welcome back!');
-      router.push('/');
+      toast.success("Welcome back!");
+      router.push("/");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to sign in with Google');
+      toast.error(error.message || "Failed to sign in with Google");
     } finally {
       setIsLoading(false);
     }
@@ -55,10 +61,10 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await signInWithPopup(auth, facebookProvider);
-      toast.success('Welcome back!');
-      router.push('/');
+      toast.success("Welcome back!");
+      router.push("/");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to sign in with Facebook');
+      toast.error(error.message ?? "Failed to sign in with Facebook");
     } finally {
       setIsLoading(false);
     }
@@ -82,7 +88,9 @@ export default function LoginPage() {
                 </Button>
               </Link>
             </div>
-            <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">
+              Welcome back
+            </CardTitle>
             <CardDescription className="text-center">
               Sign in to your account to continue shopping
             </CardDescription>
@@ -99,7 +107,9 @@ export default function LoginPage() {
                     placeholder="Enter your email"
                     className="pl-10"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -111,11 +121,13 @@ export default function LoginPage() {
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     className="pl-10 pr-10"
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
                     required
                   />
                   <button
@@ -133,13 +145,16 @@ export default function LoginPage() {
               </div>
 
               <div className="flex justify-end">
-                <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline">
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-sm text-primary hover:underline"
+                >
                   Forgot password?
                 </Link>
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Signing in...' : 'Sign In'}
+                {isLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
 
@@ -148,7 +163,9 @@ export default function LoginPage() {
                 <Separator />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
               </div>
             </div>
 
@@ -170,8 +187,11 @@ export default function LoginPage() {
             </div>
 
             <div className="text-center text-sm">
-              Don't have an account?{' '}
-              <Link href="/auth/register" className="text-primary hover:underline">
+              {"Don't have an account?"}
+              <Link
+                href="/auth/register"
+                className="text-primary hover:underline"
+              >
                 Sign up
               </Link>
             </div>

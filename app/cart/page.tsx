@@ -1,25 +1,29 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { useCartStore } from '@/lib/store';
-import { formatPrice } from '@/lib/utils';
-import { toast } from 'sonner';
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { useCartStore } from "@/lib/store";
+import { formatPrice } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function CartPage() {
-  const { items, updateQuantity, removeItem, getTotalPrice, getTotalItems } = useCartStore();
+  const { items, updateQuantity, removeItem, getTotalPrice, getTotalItems } =
+    useCartStore();
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
-  const handleUpdateQuantity = async (productId: string, newQuantity: number) => {
+  const handleUpdateQuantity = async (
+    productId: string,
+    newQuantity: number
+  ) => {
     if (newQuantity < 1) return;
-    
+
     setIsLoading(productId);
     // Simulate API call
     setTimeout(() => {
@@ -33,7 +37,7 @@ export default function CartPage() {
     // Simulate API call
     setTimeout(() => {
       removeItem(productId);
-      toast.success('Item removed from cart');
+      toast.success("Item removed from cart");
       setIsLoading(null);
     }, 300);
   };
@@ -55,12 +59,10 @@ export default function CartPage() {
           <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
           <h1 className="text-2xl font-bold mb-2">Your cart is empty</h1>
           <p className="text-muted-foreground mb-8">
-            Looks like you haven't added anything to your cart yet.
+            {"Looks like you haven't added anything to your cart yet."}
           </p>
           <Button asChild size="lg">
-            <Link href="/products">
-              Continue Shopping
-            </Link>
+            <Link href="/products">Continue Shopping</Link>
           </Button>
         </motion.div>
       </div>
@@ -73,7 +75,7 @@ export default function CartPage() {
         <div>
           <h1 className="text-2xl font-bold">Shopping Cart</h1>
           <p className="text-muted-foreground">
-            {totalItems} {totalItems === 1 ? 'item' : 'items'} in your cart
+            {totalItems} {totalItems === 1 ? "item" : "items"} in your cart
           </p>
         </div>
         <Link href="/products">
@@ -115,7 +117,9 @@ export default function CartPage() {
                         <div className="flex justify-between items-start">
                           <div>
                             <h3 className="font-semibold">{item.name}</h3>
-                            <p className="text-sm text-muted-foreground">{item.category}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {item.category}
+                            </p>
                           </div>
                           <Button
                             variant="ghost"
@@ -135,8 +139,12 @@ export default function CartPage() {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                              disabled={item.quantity <= 1 || isLoading === item.id}
+                              onClick={() =>
+                                handleUpdateQuantity(item.id, item.quantity - 1)
+                              }
+                              disabled={
+                                item.quantity <= 1 || isLoading === item.id
+                              }
                             >
                               <Minus className="h-3 w-3" />
                             </Button>
@@ -147,7 +155,9 @@ export default function CartPage() {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                              onClick={() =>
+                                handleUpdateQuantity(item.id, item.quantity + 1)
+                              }
                               disabled={isLoading === item.id}
                             >
                               <Plus className="h-3 w-3" />
@@ -156,7 +166,9 @@ export default function CartPage() {
 
                           {/* Price */}
                           <div className="text-right">
-                            <p className="font-semibold">{formatPrice(item.price * item.quantity)}</p>
+                            <p className="font-semibold">
+                              {formatPrice(item.price * item.quantity)}
+                            </p>
                             {item.quantity > 1 && (
                               <p className="text-sm text-muted-foreground">
                                 {formatPrice(item.price)} each
@@ -215,9 +227,7 @@ export default function CartPage() {
               )}
 
               <Button asChild className="w-full" size="lg">
-                <Link href="/checkout">
-                  Proceed to Checkout
-                </Link>
+                <Link href="/checkout">Proceed to Checkout</Link>
               </Button>
 
               <div className="text-center text-sm text-muted-foreground">

@@ -1,25 +1,31 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { Filter, SortAsc, Grid, List } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { ProductCard } from '@/components/product-card';
-import { useFilterStore } from '@/lib/store';
-import { products, categories } from '@/lib/data';
+import { useState, useMemo } from "react";
+import { motion } from "framer-motion";
+import { Filter, SortAsc, Grid, List } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ProductCard } from "@/components/product-card";
+import { useFilterStore } from "@/lib/store";
+import { products, categories } from "@/lib/data";
 
 export default function ProductsPage() {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
-  
+
   const {
     category,
     priceRange,
@@ -30,68 +36,72 @@ export default function ProductsPage() {
     setPriceRange,
     setRating,
     setSortBy,
-    clearFilters
+    clearFilters,
   } = useFilterStore();
 
   const filteredProducts = useMemo(() => {
-    let filtered = products.filter(product => {
+    let filtered = products.filter((product) => {
       // Search filter
-      if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      if (
+        searchQuery &&
+        !product.name.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
         return false;
       }
-      
+
       // Category filter
       if (category && product.category !== category) {
         return false;
       }
-      
+
       // Price filter
       if (product.price < priceRange[0] || product.price > priceRange[1]) {
         return false;
       }
-      
+
       // Rating filter
       if (rating > 0 && product.rating < rating) {
         return false;
       }
-      
+
       return true;
     });
 
     // Sort products
     switch (sortBy) {
-      case 'price-low':
+      case "price-low":
         filtered.sort((a, b) => a.price - b.price);
         break;
-      case 'price-high':
+      case "price-high":
         filtered.sort((a, b) => b.price - a.price);
         break;
-      case 'rating':
+      case "rating":
         filtered.sort((a, b) => b.rating - a.rating);
         break;
-      case 'name':
+      case "name":
         filtered.sort((a, b) => a.name.localeCompare(b.name));
         break;
-      case 'featured':
+      case "featured":
       default:
         filtered.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
         break;
     }
 
     return filtered;
-  }, [products, category, priceRange, rating, sortBy, searchQuery]);
+  }, [category, priceRange, rating, sortBy, searchQuery]);
+  // }, [products, category, priceRange, rating, sortBy, searchQuery]);
 
   const activeFiltersCount = [
     category ? 1 : 0,
     priceRange[0] > 0 || priceRange[1] < 1000 ? 1 : 0,
-    rating > 0 ? 1 : 0
+    rating > 0 ? 1 : 0,
   ].reduce((a, b) => a + b, 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Filters Sidebar */}
-        <div className={`lg:w-64 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+        <div className={`lg:w-64 ${showFilters ? "block" : "hidden lg:block"}`}>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
@@ -109,13 +119,15 @@ export default function ProductsPage() {
             <CardContent className="space-y-6">
               {/* Category Filter */}
               <div>
-                <Label className="text-sm font-medium mb-3 block">Category</Label>
+                <Label className="text-sm font-medium mb-3 block">
+                  Category
+                </Label>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="all-categories"
                       checked={!category}
-                      onCheckedChange={() => setCategory('')}
+                      onCheckedChange={() => setCategory("")}
                     />
                     <Label htmlFor="all-categories">All Categories</Label>
                   </div>
@@ -124,7 +136,9 @@ export default function ProductsPage() {
                       <Checkbox
                         id={cat}
                         checked={category === cat}
-                        onCheckedChange={() => setCategory(category === cat ? '' : cat)}
+                        onCheckedChange={() =>
+                          setCategory(category === cat ? "" : cat)
+                        }
                       />
                       <Label htmlFor={cat}>{cat}</Label>
                     </div>
@@ -152,8 +166,13 @@ export default function ProductsPage() {
 
               {/* Rating Filter */}
               <div>
-                <Label className="text-sm font-medium mb-3 block">Minimum Rating</Label>
-                <Select value={rating.toString()} onValueChange={(value) => setRating(Number(value))}>
+                <Label className="text-sm font-medium mb-3 block">
+                  Minimum Rating
+                </Label>
+                <Select
+                  value={rating.toString()}
+                  onValueChange={(value) => setRating(Number(value))}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Any rating" />
                   </SelectTrigger>
@@ -216,16 +235,16 @@ export default function ProductsPage() {
               {/* View Mode */}
               <div className="flex border rounded-lg">
                 <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => setViewMode('grid')}
+                  onClick={() => setViewMode("grid")}
                 >
                   <Grid className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  variant={viewMode === "list" ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => setViewMode('list')}
+                  onClick={() => setViewMode("list")}
                 >
                   <List className="h-4 w-4" />
                 </Button>
@@ -234,25 +253,39 @@ export default function ProductsPage() {
           </div>
 
           {/* Active Filters */}
-          {(category || searchQuery || priceRange[0] > 0 || priceRange[1] < 1000 || rating > 0) && (
+          {(category ||
+            searchQuery ||
+            priceRange[0] > 0 ||
+            priceRange[1] < 1000 ||
+            rating > 0) && (
             <div className="flex flex-wrap gap-2 mb-6">
               {category && (
-                <Badge variant="secondary" className="cursor-pointer" onClick={() => setCategory('')}>
+                <Badge
+                  variant="secondary"
+                  className="cursor-pointer"
+                  onClick={() => setCategory("")}
+                >
                   Category: {category} ×
                 </Badge>
               )}
               {searchQuery && (
-                <Badge variant="secondary">
-                  Search: "{searchQuery}"
-                </Badge>
+                <Badge variant="secondary">{`Search: ${searchQuery}`}</Badge>
               )}
               {(priceRange[0] > 0 || priceRange[1] < 1000) && (
-                <Badge variant="secondary" className="cursor-pointer" onClick={() => setPriceRange([0, 1000])}>
+                <Badge
+                  variant="secondary"
+                  className="cursor-pointer"
+                  onClick={() => setPriceRange([0, 1000])}
+                >
                   Price: ${priceRange[0]} - ${priceRange[1]} ×
                 </Badge>
               )}
               {rating > 0 && (
-                <Badge variant="secondary" className="cursor-pointer" onClick={() => setRating(0)}>
+                <Badge
+                  variant="secondary"
+                  className="cursor-pointer"
+                  onClick={() => setRating(0)}
+                >
                   Rating: {rating}+ stars ×
                 </Badge>
               )}
@@ -263,7 +296,9 @@ export default function ProductsPage() {
           {filteredProducts.length === 0 ? (
             <Card>
               <CardContent className="text-center py-12">
-                <p className="text-muted-foreground mb-4">No products found matching your criteria.</p>
+                <p className="text-muted-foreground mb-4">
+                  No products found matching your criteria.
+                </p>
                 <Button onClick={clearFilters}>Clear all filters</Button>
               </CardContent>
             </Card>
@@ -271,9 +306,9 @@ export default function ProductsPage() {
             <motion.div
               layout
               className={
-                viewMode === 'grid'
-                  ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
-                  : 'space-y-4'
+                viewMode === "grid"
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                  : "space-y-4"
               }
             >
               {filteredProducts.map((product) => (

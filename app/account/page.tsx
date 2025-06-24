@@ -1,40 +1,46 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { User, Package, Heart, Settings, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AuthGuard } from '@/components/auth-guard';
-import { useAuth } from '@/hooks/use-auth';
-import { mockOrders } from '@/lib/data';
-import { formatPrice } from '@/lib/utils';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { User, Package, Heart, Settings, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AuthGuard } from "@/components/auth-guard";
+import { useAuth } from "@/hooks/use-auth";
+import { mockOrders } from "@/lib/data";
+import { formatPrice } from "@/lib/utils";
 
 function AccountContent() {
   const { user, signOut } = useAuth();
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState("profile");
 
   const getInitials = (name: string) => {
     return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
       .toUpperCase();
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'delivered':
-        return 'bg-green-100 text-green-800';
-      case 'shipped':
-        return 'bg-blue-100 text-blue-800';
-      case 'processing':
-        return 'bg-yellow-100 text-yellow-800';
+      case "delivered":
+        return "bg-green-100 text-green-800";
+      case "shipped":
+        return "bg-blue-100 text-blue-800";
+      case "processing":
+        return "bg-yellow-100 text-yellow-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -51,14 +57,14 @@ function AccountContent() {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Avatar className="h-16 w-16">
-                  <AvatarImage src={user?.photoURL || ''} />
+                  <AvatarImage src={user?.photoURL || ""} />
                   <AvatarFallback>
-                    {user?.displayName ? getInitials(user.displayName) : 'U'}
+                    {user?.displayName ? getInitials(user.displayName) : "U"}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <h1 className="text-2xl font-bold">
-                    {user?.displayName || 'User'}
+                    {user?.displayName || "User"}
                   </h1>
                   <p className="text-muted-foreground">{user?.email}</p>
                 </div>
@@ -105,7 +111,7 @@ function AccountContent() {
                   <div>
                     <label className="text-sm font-medium">Full Name</label>
                     <p className="text-muted-foreground">
-                      {user?.displayName || 'Not provided'}
+                      {user?.displayName ?? "Not provided"}
                     </p>
                   </div>
                   <div>
@@ -119,10 +125,11 @@ function AccountContent() {
                   <div>
                     <label className="text-sm font-medium">Member Since</label>
                     <p className="text-muted-foreground">
-                      {user?.metadata?.creationTime 
-                        ? new Date(user.metadata.creationTime).toLocaleDateString()
-                        : 'Unknown'
-                      }
+                      {user?.metadata?.creationTime
+                        ? new Date(
+                            user.metadata.creationTime
+                          ).toLocaleDateString()
+                        : "Unknown"}
                     </p>
                   </div>
                 </div>
@@ -147,7 +154,8 @@ function AccountContent() {
                         <div>
                           <h3 className="font-semibold">Order #{order.id}</h3>
                           <p className="text-sm text-muted-foreground">
-                            Placed on {new Date(order.date).toLocaleDateString()}
+                            Placed on{" "}
+                            {new Date(order.date).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="text-right">
@@ -161,9 +169,16 @@ function AccountContent() {
                       </div>
                       <div className="space-y-2">
                         {order.items.map((item, index) => (
-                          <div key={index} className="flex justify-between text-sm">
-                            <span>{item.name} x{item.quantity}</span>
-                            <span>{formatPrice(item.price * item.quantity)}</span>
+                          <div
+                            key={index + "sdjnjv"}
+                            className="flex justify-between text-sm"
+                          >
+                            <span>
+                              {item.name} x{item.quantity}
+                            </span>
+                            <span>
+                              {formatPrice(item.price * item.quantity)}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -179,7 +194,7 @@ function AccountContent() {
               <CardHeader>
                 <CardTitle>Wishlist</CardTitle>
                 <CardDescription>
-                  Items you've saved for later
+                  {"Items you've saved for later"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
