@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
       setIsEmailSent(true);
       toast.success("Password reset email sent!");
     } catch (error: any) {
-      toast.error(error.message || "Failed to send reset email");
+      toast.error(error.message ?? "Failed to send reset email");
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
               <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-600" />
               <h2 className="text-2xl font-bold mb-2">Check your email</h2>
               <p className="text-muted-foreground mb-6">
-                We've sent a password reset link to {email}
+                {`We've sent a password reset link to ${email}`}
               </p>
               <div className="space-y-3">
                 <Button asChild className="w-full">
@@ -95,8 +95,8 @@ export default function ForgotPasswordPage() {
               Forgot password?
             </CardTitle>
             <CardDescription className="text-center">
-              Enter your email address and we'll send you a link to reset your
-              password
+              {`Enter your email address and we'll send you a link to reset your
+              password`}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -124,10 +124,7 @@ export default function ForgotPasswordPage() {
 
             <div className="text-center text-sm">
               Remember your password?{" "}
-              <Link
-                href="/auth/login"
-                className="text-primary hover:underline"
-              >
+              <Link href="/auth/login" className="text-primary hover:underline">
                 Sign in
               </Link>
             </div>
