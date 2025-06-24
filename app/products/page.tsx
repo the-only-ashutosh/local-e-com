@@ -22,11 +22,11 @@ import { ProductCard } from "@/components/product-card";
 import { useFilterStore } from "@/lib/store";
 import { products, categories } from "@/lib/data";
 
-export default function ProductsPage({ 
-  searchParams 
-}: { 
-  searchParams?: { [key: string]: string | string[] | undefined } 
-}) {
+export default function ProductsPage({
+  searchParams,
+}: Readonly<{
+  searchParams: Promise<{ [key: string]: string | string[] }> | undefined;
+}>) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
 
