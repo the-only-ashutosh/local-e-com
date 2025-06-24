@@ -20,7 +20,11 @@ import { Separator } from "@/components/ui/separator";
 import { ProductCard } from "@/components/product-card";
 import { products, categories } from "@/lib/data";
 
-export default function CategoryPage() {
+export default function CategoryPage({ 
+  searchParams 
+}: { 
+  searchParams?: { [key: string]: string | string[] | undefined } 
+}) {
   const params = useParams();
   const categorySlug = params.category as string;
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
