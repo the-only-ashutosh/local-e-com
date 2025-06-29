@@ -11,6 +11,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/product-card";
 import { CitySelector } from "@/components/city-selector";
+import { CityGreeting } from "@/components/city-greeting";
+import { TopDealsCarousel } from "@/components/top-deals-carousel";
 import { featuredProducts, saleProducts, categories } from "@/lib/data";
 import { City, getCityBySlug } from "@/data/cities";
 
@@ -30,6 +32,7 @@ const itemVariants = {
 export default function HomePage() {
   const [showCitySelector, setShowCitySelector] = useState(false);
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check if city cookie exists
@@ -46,6 +49,7 @@ export default function HomePage() {
     } else {
       setShowCitySelector(true);
     }
+    setIsLoading(false);
   }, []);
 
   const handleCitySelect = (city: City) => {
@@ -78,6 +82,17 @@ export default function HomePage() {
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your local shopping experience...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-16">
       {/* City Selector Modal */}
@@ -85,6 +100,11 @@ export default function HomePage() {
         isOpen={showCitySelector}
         onCitySelect={handleCitySelect}
       />
+
+      {/* City Greeting */}
+      {selectedCity && (
+        <CityGreeting city={selectedCity} />
+      )}
 
       {/* Hero Section */}
       <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
@@ -139,29 +159,9 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* City Info Section */}
+      {/* Top Deals Carousel */}
       {selectedCity && (
-        <section className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl font-bold mb-4">Shopping in {selectedCity.name}</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Discover amazing local businesses in {selectedCity.name}, {selectedCity.state}. 
-              From fresh groceries to unique finds, support your local community.
-            </p>
-            <div className="mt-6">
-              <Button asChild size="lg">
-                <Link href="/shops">
-                  View All Shops in {selectedCity.name}
-                </Link>
-              </Button>
-            </div>
-          </motion.div>
-        </section>
+        <TopDealsCarousel city={selectedCity} />
       )}
 
       {/* Features */}
@@ -282,6 +282,7 @@ export default function HomePage() {
             <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
               Subscribe to our newsletter and be the first to know about new
               local businesses, exclusive deals, and community events
+              {selectedCity && ` in ${selectedCity.name}`}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
               <input
