@@ -48,6 +48,7 @@ export function Header() {
 
   const navigation = [
     { name: "Home", href: "/" },
+    { name: "Shops", href: "/shops" },
     { name: "Products", href: "/products" },
     { name: "Categories", href: "/categories" },
   ];
@@ -57,18 +58,18 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2 shrink-0">
             <Store className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">ModernShop</span>
+            <span className="text-xl font-bold hidden sm:block">ModernShop</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
               >
                 {item.name}
               </Link>
@@ -90,7 +91,7 @@ export function Header() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 shrink-0">
             {/* Search - Mobile */}
             <Button
               variant="ghost"
@@ -102,7 +103,7 @@ export function Header() {
             </Button>
 
             {/* Wishlist */}
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="hidden sm:flex">
               <Heart className="h-5 w-5" />
             </Button>
 
@@ -122,7 +123,9 @@ export function Header() {
             </Link>
 
             {/* Theme Toggle */}
-            <ThemeToggle />
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
 
             {/* User Menu */}
             <DropdownMenu>
@@ -182,9 +185,9 @@ export function Header() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="lg:hidden overflow-hidden"
+            className="lg:hidden overflow-hidden border-t"
           >
-            <div className="py-4 border-t">
+            <div className="py-4">
               <div className="container mx-auto px-4">
                 <form onSubmit={handleSearch} className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -209,16 +212,16 @@ export function Header() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden overflow-hidden"
+            className="md:hidden overflow-hidden border-t"
           >
-            <div className="py-4 border-t">
+            <div className="py-4">
               <div className="container mx-auto px-4">
                 <nav className="flex flex-col space-y-4">
                   {navigation.map((item) => (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {item.name}
@@ -226,33 +229,38 @@ export function Header() {
                   ))}
 
                   {/* Mobile-only actions */}
-                  <div className="pt-4 border-t space-y-2">
+                  <div className="pt-4 border-t space-y-3">
                     <Link
                       href="/cart"
-                      className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      <ShoppingCart className="h-4 w-4 mr-3" />
                       Cart {totalItems > 0 && `(${totalItems})`}
                     </Link>
 
                     <Link
                       href="#"
-                      className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      <Heart className="h-4 w-4 mr-2" />
+                      <Heart className="h-4 w-4 mr-3" />
                       Wishlist
                     </Link>
+
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-sm font-medium text-muted-foreground">Theme</span>
+                      <ThemeToggle />
+                    </div>
 
                     {isAuthenticated ? (
                       <>
                         <Link
                           href="/account"
-                          className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                          className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
-                          <User className="h-4 w-4 mr-2" />
+                          <User className="h-4 w-4 mr-3" />
                           My Account
                         </Link>
                         <button
@@ -260,7 +268,7 @@ export function Header() {
                             signOut();
                             setIsMobileMenuOpen(false);
                           }}
-                          className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full text-left"
+                          className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full text-left py-2"
                         >
                           Sign Out
                         </button>
@@ -269,14 +277,14 @@ export function Header() {
                       <>
                         <Link
                           href="/auth/login"
-                          className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                          className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
                           Sign In
                         </Link>
                         <Link
                           href="/auth/register"
-                          className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                          className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
                           Sign Up

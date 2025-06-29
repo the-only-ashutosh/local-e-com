@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cities, City } from '@/data/cities';
 
 interface CitySelectorProps {
@@ -15,21 +16,48 @@ interface CitySelectorProps {
   onClose?: () => void;
 }
 
+// Fuzzy search function
+function fuzzySearch(query: string, text: string): boolean {
+  const queryLower = query.toLowerCase();
+  const textLower = text.toLowerCase();
+  
+  if (textLower.includes(queryLower)) return true;
+  
+  let queryIndex = 0;
+  for (let i = 0; i < textLower.length && queryIndex < queryLower.length; i++) {
+    if (textLower[i] === queryLower[queryIndex]) {
+      queryIndex++;
+    }
+  }
+  return queryIndex === queryLower.length;
+}
+
 export function CitySelector({ isOpen, onCitySelect, onClose }: CitySelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const filteredCities = cities.filter(city =>
-    city.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    city.state.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredCities = useMemo(() => {
+    if (!searchQuery.trim()) return cities;
+    
+    return cities.filter(city =>
+      fuzzySearch(searchQuery, city.name) ||
+      fuzzySearch(searchQuery, city.state) ||
+      fuzzySearch(searchQuery, `${city.name} ${city.state}`)
+    );
+  }, [searchQuery]);
 
   const handleCitySelect = (city: City) => {
     setSelectedCity(city);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (selectedCity) {
+      setIsLoading(true);
+      
+      // Simulate loading delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       // Set cookie
       document.cookie = `city=${selectedCity.slug}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
       onCitySelect(selectedCity);
@@ -79,7 +107,7 @@ export function CitySelector({ isOpen, onCitySelect, onClose }: CitySelectorProp
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search for your city..."
+                  placeholder="Search for your city... (try fuzzy search)"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -88,53 +116,77 @@ export function CitySelector({ isOpen, onCitySelect, onClose }: CitySelectorProp
 
               {/* City List */}
               <div className="max-h-64 overflow-y-auto space-y-2">
-                {filteredCities.map((city) => (
-                  <motion.div
-                    key={city.slug}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Card
-                      className={`cursor-pointer transition-all ${
-                        selectedCity?.slug === city.slug
-                          ? 'ring-2 ring-primary bg-primary/5'
-                          : 'hover:bg-muted/50'
-                      }`}
-                      onClick={() => handleCitySelect(city)}
-                    >
+                {isLoading ? (
+                  // Loading skeletons
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <Card key={i}>
                       <CardContent className="p-3">
                         <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium">{city.name}</h4>
-                            <p className="text-sm text-muted-foreground">
-                              {city.state}, {city.country}
-                            </p>
+                          <div className="space-y-2 flex-1">
+                            <Skeleton className="h-4 w-24" />
+                            <Skeleton className="h-3 w-32" />
                           </div>
-                          {selectedCity?.slug === city.slug && (
-                            <Badge variant="default">Selected</Badge>
-                          )}
+                          <Skeleton className="h-6 w-16" />
                         </div>
                       </CardContent>
                     </Card>
-                  </motion.div>
-                ))}
+                  ))
+                ) : filteredCities.length > 0 ? (
+                  filteredCities.map((city) => (
+                    <motion.div
+                      key={city.slug}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Card
+                        className={`cursor-pointer transition-all ${
+                          selectedCity?.slug === city.slug
+                            ? 'ring-2 ring-primary bg-primary/5'
+                            : 'hover:bg-muted/50'
+                        }`}
+                        onClick={() => handleCitySelect(city)}
+                      >
+                        <CardContent className="p-3">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="font-medium">{city.name}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {city.state}, {city.country}
+                              </p>
+                            </div>
+                            {selectedCity?.slug === city.slug && (
+                              <Badge variant="default">Selected</Badge>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <MapPin className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p>No cities found matching "{searchQuery}".</p>
+                    <p className="text-xs mt-1">Try a different search term.</p>
+                  </div>
+                )}
               </div>
-
-              {filteredCities.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
-                  <MapPin className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p>No cities found matching your search.</p>
-                </div>
-              )}
 
               {/* Confirm Button */}
               <Button
                 onClick={handleConfirm}
-                disabled={!selectedCity}
+                disabled={!selectedCity || isLoading}
                 className="w-full"
                 size="lg"
               >
-                {selectedCity ? `Continue with ${selectedCity.name}` : 'Select a city'}
+                {isLoading 
+                  ? 'Loading...' 
+                  : selectedCity 
+                    ? `Continue with ${selectedCity.name}` 
+                    : 'Select a city'
+                }
               </Button>
             </CardContent>
           </Card>
