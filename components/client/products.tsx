@@ -17,11 +17,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { ProductCard } from "@/components/product-card";
 import { useFilterStore } from "@/lib/store";
 import { Product } from "@/lib/type";
 import { HOST } from "@/lib/consts";
 import { generateRandom } from "@/lib/utils";
+
+const ITEMS_PER_PAGE = 18;
 
 const ProductsComp = ({
   prods,
@@ -34,6 +37,7 @@ const ProductsComp = ({
   const [showFilters, setShowFilters] = useState(false);
   const [newLoading, setNewLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>(prods);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const {
     category,
@@ -49,7 +53,7 @@ const ProductsComp = ({
   } = useFilterStore();
 
   useEffect(() => {
-    if (newLoading || filteredProducts.length === 18) return;
+    if (newLoading || filteredProducts.length === ITEMS_PER_PAGE) return;
     const queryString = [];
     if (category.name.length > 0) {
       queryString.push(`category=${category.id}`);
@@ -75,7 +79,6 @@ const ProductsComp = ({
   const filteredProducts = useMemo(() => {
     const filtered = products.filter((product) => {
       // Search filter
-      //   console.log(searchQuery);
       if (
         searchQuery &&
         !product.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -84,7 +87,6 @@ const ProductsComp = ({
       }
 
       // Category filter
-      //   console.log(category, product.category.name);
       if (
         category.name.length > 0 &&
         product.category.xata_id !== category.id
@@ -93,7 +95,6 @@ const ProductsComp = ({
       }
 
       // Price filter
-      //   console.log(product.price, priceRange[0], priceRange[1]);
       if (product.price < priceRange[0] || product.price > priceRange[1]) {
         return false;
       }
@@ -130,7 +131,16 @@ const ProductsComp = ({
 
     return filtered;
   }, [category, priceRange, rating, sortBy, searchQuery, products]);
-  // }, [products, category, priceRange, rating, sortBy, searchQuery]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [category, priceRange, rating, sortBy, searchQuery]);
 
   const activeFiltersCount = [
     category ? 1 : 0,
@@ -141,14 +151,14 @@ const ProductsComp = ({
   const [fixedQuery, setFixedQuery] = useState(
     `sort=${sortBy}&priceLow=${priceRange[0]}&priceHigh=${
       priceRange[1]
-    }&limit=${18 - filteredProducts.length}`
+    }&limit=${ITEMS_PER_PAGE - filteredProducts.length}`
   );
 
   useEffect(() => {
     setFixedQuery(
       `sort=${sortBy}&priceLow=${priceRange[0]}&priceHigh=${
         priceRange[1]
-      }&limit=${18 - filteredProducts.length}`
+      }&limit=${ITEMS_PER_PAGE - filteredProducts.length}`
     );
   }, [priceRange, sortBy, filteredProducts]);
 
@@ -256,7 +266,8 @@ const ProductsComp = ({
             <div>
               <h1 className="text-2xl font-bold">Products</h1>
               <p className="text-muted-foreground">
-                Showing {filteredProducts.length} of {products.length} products
+                Showing {paginatedProducts.length} of {filteredProducts.length} products
+                {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
               </p>
             </div>
 
@@ -363,27 +374,113 @@ const ProductsComp = ({
               </CardContent>
             </Card>
           ) : (
-            <motion.div
-              layout
-              className={
-                viewMode === "grid"
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                  : "space-y-4"
-              }
-            >
-              {filteredProducts.map((product, i) => (
+            <>
+              <motion.div
+                layout
+                className={
+                  viewMode === "grid"
+                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
+                    : "space-y-4 mb-8"
+                }
+              >
+                {paginatedProducts.map((product, i) => (
+                  <motion.div
+                    key={product.xata_id + generateRandom(i * 1.0, 100.0)}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ProductCard product={product} />
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
                 <motion.div
-                  key={product.xata_id + generateRandom(i * 1.0, 100.0)}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.2 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex justify-center"
                 >
-                  <ProductCard product={product} />
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (currentPage > 1) {
+                              setCurrentPage(currentPage - 1);
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }
+                          }}
+                          className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
+                        />
+                      </PaginationItem>
+                      
+                      {/* Show page numbers with ellipsis for large page counts */}
+                      {(() => {
+                        const pages = [];
+                        const showEllipsis = totalPages > 7;
+                        
+                        if (!showEllipsis) {
+                          // Show all pages if 7 or fewer
+                          for (let i = 1; i <= totalPages; i++) {
+                            pages.push(i);
+                          }
+                        } else {
+                          // Show first page, current page area, and last page with ellipsis
+                          if (currentPage <= 3) {
+                            pages.push(1, 2, 3, 4, '...', totalPages);
+                          } else if (currentPage >= totalPages - 2) {
+                            pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+                          } else {
+                            pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+                          }
+                        }
+                        
+                        return pages.map((page, index) => (
+                          <PaginationItem key={index}>
+                            {page === '...' ? (
+                              <span className="px-3 py-2 text-muted-foreground">...</span>
+                            ) : (
+                              <PaginationLink
+                                href="#"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setCurrentPage(page as number);
+                                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                isActive={currentPage === page}
+                              >
+                                {page}
+                              </PaginationLink>
+                            )}
+                          </PaginationItem>
+                        ));
+                      })()}
+                      
+                      <PaginationItem>
+                        <PaginationNext 
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (currentPage < totalPages) {
+                              setCurrentPage(currentPage + 1);
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }
+                          }}
+                          className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
                 </motion.div>
-              ))}
-            </motion.div>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { ShopsContent } from '@/components/shops-content';
 import { getShopsByCity } from '@/data/shops';
 import { getCityBySlug } from '@/data/cities';
