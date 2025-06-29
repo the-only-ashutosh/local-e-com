@@ -24,7 +24,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-export default async function HomePage() {
+export default function HomePage() {
   const features = [
     {
       icon: Truck,
