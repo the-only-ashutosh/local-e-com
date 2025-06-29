@@ -1,20 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, CreditCard, MapPin, Package } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CreditCard,
+  MapPin,
+  Package,
+} from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { AuthGuard } from "@/components/auth-guard";
 import { useAuth } from "@/hooks/use-auth";
 import { useCartStore } from "@/lib/store";
@@ -37,7 +55,9 @@ const addressSchema = z.object({
 
 const paymentSchema = z.object({
   cardNumber: z.string().min(16, "Card number must be 16 digits"),
-  expiryDate: z.string().regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Invalid expiry date (MM/YY)"),
+  expiryDate: z
+    .string()
+    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Invalid expiry date (MM/YY)"),
   cvv: z.string().min(3, "CVV must be at least 3 digits"),
   cardName: z.string().min(2, "Name on card is required"),
 });
@@ -63,9 +83,9 @@ function CheckoutContent() {
   const addressForm = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
-      email: user?.email || "",
-      firstName: user?.displayName?.split(" ")[0] || "",
-      lastName: user?.displayName?.split(" ")[1] || "",
+      email: user?.email ?? "",
+      firstName: user?.displayName?.split(" ")[0] ?? "",
+      lastName: user?.displayName?.split(" ")[1] ?? "",
     },
   });
 
@@ -111,7 +131,7 @@ function CheckoutContent() {
 
   const handlePlaceOrder = async () => {
     setIsProcessing(true);
-    
+
     // Simulate order processing
     setTimeout(() => {
       clearCart();
@@ -139,7 +159,9 @@ function CheckoutContent() {
               </div>
               <span
                 className={`ml-2 text-sm font-medium ${
-                  currentStep >= step.id ? "text-foreground" : "text-muted-foreground"
+                  currentStep >= step.id
+                    ? "text-foreground"
+                    : "text-muted-foreground"
                 }`}
               >
                 {step.title}
@@ -171,7 +193,10 @@ function CheckoutContent() {
                 </CardHeader>
                 <CardContent>
                   <Form {...addressForm}>
-                    <form onSubmit={addressForm.handleSubmit(handleAddressSubmit)} className="space-y-4">
+                    <form
+                      onSubmit={addressForm.handleSubmit(handleAddressSubmit)}
+                      className="space-y-4"
+                    >
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={addressForm.control}
@@ -292,16 +317,23 @@ function CheckoutContent() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Country</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
                               <FormControl>
                                 <SelectTrigger>
                                   <SelectValue placeholder="Select a country" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="us">United States</SelectItem>
+                                <SelectItem value="us">
+                                  United States
+                                </SelectItem>
                                 <SelectItem value="ca">Canada</SelectItem>
-                                <SelectItem value="uk">United Kingdom</SelectItem>
+                                <SelectItem value="uk">
+                                  United Kingdom
+                                </SelectItem>
                                 <SelectItem value="au">Australia</SelectItem>
                               </SelectContent>
                             </Select>
@@ -341,7 +373,10 @@ function CheckoutContent() {
                 </CardHeader>
                 <CardContent>
                   <Form {...paymentForm}>
-                    <form onSubmit={paymentForm.handleSubmit(handlePaymentSubmit)} className="space-y-4">
+                    <form
+                      onSubmit={paymentForm.handleSubmit(handlePaymentSubmit)}
+                      className="space-y-4"
+                    >
                       <FormField
                         control={paymentForm.control}
                         name="cardNumber"
@@ -349,7 +384,10 @@ function CheckoutContent() {
                           <FormItem>
                             <FormLabel>Card Number</FormLabel>
                             <FormControl>
-                              <Input placeholder="1234 5678 9012 3456" {...field} />
+                              <Input
+                                placeholder="1234 5678 9012 3456"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -440,7 +478,8 @@ function CheckoutContent() {
                       </p>
                       <p>{addressData.address}</p>
                       <p>
-                        {addressData.city}, {addressData.state} {addressData.zipCode}
+                        {addressData.city}, {addressData.state}{" "}
+                        {addressData.zipCode}
                       </p>
                       <p>{addressData.country}</p>
                       <p>{addressData.email}</p>
@@ -492,10 +531,13 @@ function CheckoutContent() {
                 <CardContent>
                   <div className="space-y-4">
                     {items.map((item) => (
-                      <div key={item.id} className="flex items-center space-x-4">
+                      <div
+                        key={item.xata_id}
+                        className="flex items-center space-x-4"
+                      >
                         <div className="relative w-16 h-16 rounded-lg overflow-hidden">
                           <Image
-                            src={item.image}
+                            src={item.images[0]}
                             alt={item.name}
                             fill
                             className="object-cover"
@@ -517,10 +559,7 @@ function CheckoutContent() {
               </Card>
 
               <div className="flex justify-between">
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentStep(2)}
-                >
+                <Button variant="outline" onClick={() => setCurrentStep(2)}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Payment
                 </Button>
@@ -529,7 +568,9 @@ function CheckoutContent() {
                   disabled={isProcessing}
                   size="lg"
                 >
-                  {isProcessing ? "Processing..." : `Place Order - ${formatPrice(total)}`}
+                  {isProcessing
+                    ? "Processing..."
+                    : `Place Order - ${formatPrice(total)}`}
                 </Button>
               </div>
             </motion.div>
@@ -545,7 +586,10 @@ function CheckoutContent() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span>Subtotal ({items.reduce((acc, item) => acc + item.quantity, 0)} items)</span>
+                  <span>
+                    Subtotal (
+                    {items.reduce((acc, item) => acc + item.quantity, 0)} items)
+                  </span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">

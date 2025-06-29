@@ -1,23 +1,27 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Heart, ShoppingCart, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { useCartStore, Product } from '@/lib/store';
-import { formatPrice, calculateDiscount } from '@/lib/utils';
-import { toast } from 'sonner';
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { useCartStore } from "@/lib/store";
+import { formatPrice, calculateDiscount } from "@/lib/utils";
+import { toast } from "sonner";
+import { Product } from "@/lib/type";
 
 interface ProductCardProps {
   product: Product;
-  variant?: 'default' | 'featured';
+  variant?: "default" | "featured";
 }
 
-export function ProductCard({ product, variant = 'default' }: ProductCardProps) {
+export function ProductCard({
+  product,
+  variant = "default",
+}: Readonly<ProductCardProps>) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const { addItem } = useCartStore();
 
@@ -30,29 +34,32 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsWishlisted(!isWishlisted);
-    toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
+    toast.success(isWishlisted ? "Removed from wishlist" : "Added to wishlist");
   };
 
-  const discount = product.sale && product.originalPrice 
-    ? calculateDiscount(product.originalPrice, product.price)
-    : 0;
+  const discount =
+    product.sale && product.originalPrice
+      ? calculateDiscount(product.originalPrice, product.price)
+      : 0;
 
   return (
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
-      className={variant === 'featured' ? 'lg:col-span-2' : ''}
+      className={variant === "featured" ? "lg:col-span-2" : ""}
     >
-      <Card className="group overflow-hidden border-0 shadow-sm hover:shadow-lg transition-all duration-300">
+      <Card className="group overflow-hidden border-0 shadow-xs hover:shadow-lg transition-all duration-300">
         <Link href={`/products/${product.slug}`}>
           <div className="relative aspect-square overflow-hidden">
             <Image
-              src={product.image}
+              src={
+                "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg"
+              }
               alt={product.name}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-110"
             />
-            
+
             {/* Badges */}
             <div className="absolute top-2 left-2 flex flex-col gap-1">
               {product.sale && (
@@ -61,9 +68,7 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
                 </Badge>
               )}
               {product.featured && (
-                <Badge className="text-xs bg-primary">
-                  Featured
-                </Badge>
+                <Badge className="text-xs bg-primary">Featured</Badge>
               )}
             </div>
 
@@ -75,17 +80,17 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
                 className="h-8 w-8"
                 onClick={handleWishlist}
               >
-                <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current text-red-500' : ''}`} />
+                <Heart
+                  className={`h-4 w-4 ${
+                    isWishlisted ? "fill-current text-red-500" : ""
+                  }`}
+                />
               </Button>
             </div>
 
             {/* Quick Add to Cart */}
             <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button 
-                onClick={handleAddToCart}
-                className="w-full"
-                size="sm"
-              >
+              <Button onClick={handleAddToCart} className="w-full" size="sm">
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 Add to Cart
               </Button>
@@ -97,22 +102,22 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
           <Link href={`/products/${product.slug}`}>
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                {product.category}
+                {product.category.name}
               </p>
               <h3 className="font-semibold line-clamp-2 group-hover:text-primary transition-colors">
                 {product.name}
               </h3>
-              
+
               {/* Rating */}
               <div className="flex items-center gap-1">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
                     <Star
-                      key={i}
+                      key={i + "ihdsk"}
                       className={`h-3 w-3 ${
-                        i < Math.floor(product.rating)
-                          ? 'fill-current text-yellow-400'
-                          : 'text-gray-300'
+                        i < Math.floor(product.totalStar / product.reviewCount)
+                          ? "fill-current text-yellow-400"
+                          : "text-gray-300"
                       }`}
                     />
                   ))}
@@ -127,7 +132,7 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
                 <span className="font-bold text-lg">
                   {formatPrice(product.price)}
                 </span>
-                {product.originalPrice && (
+                {product.originalPrice > 0 && (
                   <span className="text-sm text-muted-foreground line-through">
                     {formatPrice(product.originalPrice)}
                   </span>

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -38,7 +39,7 @@ export default function LoginPage() {
       toast.success("Welcome back!");
       router.push("/");
     } catch (error: any) {
-      toast.error(error.message || "Failed to sign in");
+      toast.error(error.message ?? "Failed to sign in");
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +72,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-primary/5 to-secondary/5 px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

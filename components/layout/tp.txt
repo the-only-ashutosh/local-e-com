@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,7 +40,7 @@ export function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/products?search=${searchQuery.trim()}`);
+      router.push("/products");
       setIsSearchOpen(false);
       setIsMobileMenuOpen(false);
     }
@@ -173,123 +173,115 @@ export function Header() {
             </Button>
           </div>
         </div>
+
+        {/* Mobile Search */}
+        <AnimatePresence>
+          {isSearchOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="lg:hidden py-4 border-t"
+            >
+              <form onSubmit={handleSearch} className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Mobile Navigation */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="md:hidden py-4 border-t"
+            >
+              <nav className="flex flex-col space-y-4">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+                
+                {/* Mobile-only actions */}
+                <div className="pt-4 border-t space-y-2">
+                  <Link
+                    href="/cart"
+                    className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Cart {totalItems > 0 && `(${totalItems})`}
+                  </Link>
+                  
+                  <Link
+                    href="#"
+                    className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Heart className="h-4 w-4 mr-2" />
+                    Wishlist
+                  </Link>
+                  
+                  {isAuthenticated ? (
+                    <>
+                      <Link
+                        href="/account"
+                        className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <User className="h-4 w-4 mr-2" />
+                        My Account
+                      </Link>
+                      <button
+                        onClick={() => {
+                          signOut();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full text-left"
+                      >
+                        Sign Out
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/auth/login"
+                        className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Sign In
+                      </Link>
+                      <Link
+                        href="/auth/register"
+                        className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Sign Up
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-
-      {/* Mobile Search */}
-      <AnimatePresence>
-        {isSearchOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="lg:hidden overflow-hidden"
-          >
-            <div className="py-4 border-t">
-              <div className="container mx-auto px-4">
-                <form onSubmit={handleSearch} className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Search products..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </form>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Mobile Navigation */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="md:hidden overflow-hidden"
-          >
-            <div className="py-4 border-t">
-              <div className="container mx-auto px-4">
-                <nav className="flex flex-col space-y-4">
-                  {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-
-                  {/* Mobile-only actions */}
-                  <div className="pt-4 border-t space-y-2">
-                    <Link
-                      href="/cart"
-                      className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <ShoppingCart className="h-4 w-4 mr-2" />
-                      Cart {totalItems > 0 && `(${totalItems})`}
-                    </Link>
-
-                    <Link
-                      href="#"
-                      className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <Heart className="h-4 w-4 mr-2" />
-                      Wishlist
-                    </Link>
-
-                    {isAuthenticated ? (
-                      <>
-                        <Link
-                          href="/account"
-                          className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          <User className="h-4 w-4 mr-2" />
-                          My Account
-                        </Link>
-                        <button
-                          onClick={() => {
-                            signOut();
-                            setIsMobileMenuOpen(false);
-                          }}
-                          className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full text-left"
-                        >
-                          Sign Out
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <Link
-                          href="/auth/login"
-                          className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          Sign In
-                        </Link>
-                        <Link
-                          href="/auth/register"
-                          className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          Sign Up
-                        </Link>
-                      </>
-                    )}
-                  </div>
-                </nav>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
   );
 }

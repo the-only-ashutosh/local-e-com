@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, ArrowLeft, Trash2 } from "lucide-react";
@@ -86,7 +86,7 @@ export default function CartPage() {
         <div className="lg:col-span-2 space-y-4">
           <AnimatePresence>
             {items.map((item) => (
-              <CartItem key={item.id} item={item} />
+              <CartItem key={item.xata_id} item={item} />
             ))}
           </AnimatePresence>
         </div>

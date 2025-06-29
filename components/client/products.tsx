@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { useParams } from "next/navigation";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
-import { ArrowLeft, Filter, SortAsc, Grid, List } from "lucide-react";
+import { Filter, SortAsc, Grid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -14,38 +13,87 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ProductCard } from "@/components/product-card";
-import { products, categories } from "@/lib/data";
-import { Label } from "@/components/ui/label";
+import { useFilterStore } from "@/lib/store";
+import { Product } from "@/lib/type";
+import { HOST } from "@/lib/consts";
+import { generateRandom } from "@/lib/utils";
 
-export default function CategoryPage({
-  searchParams,
-}: Readonly<{
-  searchParams: Promise<{ [key: string]: string | string[] }> | undefined;
-}>) {
-  const params = useParams();
-  const categorySlug = params.category; //as string;
+const ProductsComp = ({
+  prods,
+  cats,
+}: {
+  prods: Product[];
+  cats: { name: string; id: string }[];
+}) => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-  const [rating, setRating] = useState(0);
-  const [sortBy, setSortBy] = useState("featured");
+  const [newLoading, setNewLoading] = useState(false);
+  const [products, setProducts] = useState<Product[]>(prods);
 
-  // Convert slug back to category name
-  const categoryName = categories.find(
-    (cat) => cat.toLowerCase().replace(/\s+/g, "-") === categorySlug
-  );
+  const {
+    category,
+    priceRange,
+    rating,
+    sortBy,
+    searchQuery,
+    setCategory,
+    setPriceRange,
+    setRating,
+    setSortBy,
+    clearFilters,
+  } = useFilterStore();
+
+  useEffect(() => {
+    if (newLoading || filteredProducts.length === 18) return;
+    const queryString = [];
+    if (category.name.length > 0) {
+      queryString.push(`category=${category.id}`);
+    }
+    if (searchQuery.trim().length > 0) {
+      queryString.push(`search=${searchQuery}`);
+    }
+    queryString.push(fixedQuery);
+    setNewLoading(true);
+    console.log(fixedQuery);
+    fetch(`${HOST}/products/filter?${queryString.join("&")}`, { method: "GET" })
+      .then((res) => res.json())
+      .then((res) => {
+        setNewLoading(false);
+        const toAdd = Array.from(res["records"]).filter(
+          (e) => !filteredProducts.includes(e as Product)
+        );
+        console.log(toAdd.length, res["records"].length);
+        setProducts([...filteredProducts, ...(toAdd as Product[])]);
+      });
+  }, [category, searchQuery]);
 
   const filteredProducts = useMemo(() => {
-    let filtered = products.filter((product) => {
-      if (!categoryName || product.category.name !== categoryName) {
+    const filtered = products.filter((product) => {
+      // Search filter
+      //   console.log(searchQuery);
+      if (
+        searchQuery &&
+        !product.name.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
+        return false;
+      }
+
+      // Category filter
+      //   console.log(category, product.category.name);
+      if (
+        category.name.length > 0 &&
+        product.category.xata_id !== category.id
+      ) {
         return false;
       }
 
       // Price filter
+      //   console.log(product.price, priceRange[0], priceRange[1]);
       if (product.price < priceRange[0] || product.price > priceRange[1]) {
         return false;
       }
@@ -81,45 +129,31 @@ export default function CategoryPage({
     }
 
     return filtered;
-  }, [categoryName, priceRange, rating, sortBy]);
-
-  if (!categoryName) {
-    return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">Category not found</h1>
-        <Button asChild>
-          <Link href="/categories">Back to Categories</Link>
-        </Button>
-      </div>
-    );
-  }
+  }, [category, priceRange, rating, sortBy, searchQuery, products]);
+  // }, [products, category, priceRange, rating, sortBy, searchQuery]);
 
   const activeFiltersCount = [
+    category ? 1 : 0,
     priceRange[0] > 0 || priceRange[1] < 1000 ? 1 : 0,
     rating > 0 ? 1 : 0,
   ].reduce((a, b) => a + b, 0);
 
-  const clearFilters = () => {
-    setPriceRange([0, 1000]);
-    setRating(0);
-    setSortBy("featured");
-  };
+  const [fixedQuery, setFixedQuery] = useState(
+    `sort=${sortBy}&priceLow=${priceRange[0]}&priceHigh=${
+      priceRange[1]
+    }&limit=${18 - filteredProducts.length}`
+  );
+
+  useEffect(() => {
+    setFixedQuery(
+      `sort=${sortBy}&priceLow=${priceRange[0]}&priceHigh=${
+        priceRange[1]
+      }&limit=${18 - filteredProducts.length}`
+    );
+  }, [priceRange, sortBy, filteredProducts]);
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Breadcrumb */}
-      <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-8">
-        <Link href="/" className="hover:text-foreground">
-          Home
-        </Link>
-        <span>/</span>
-        <Link href="/categories" className="hover:text-foreground">
-          Categories
-        </Link>
-        <span>/</span>
-        <span className="text-foreground">{categoryName}</span>
-      </nav>
-
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Filters Sidebar */}
         <div className={`lg:w-64 ${showFilters ? "block" : "hidden lg:block"}`}>
@@ -138,15 +172,51 @@ export default function CategoryPage({
               )}
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Category Filter */}
+              <div>
+                <Label className="text-sm font-medium mb-3 block">
+                  Category
+                </Label>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="all-categories"
+                      checked={category.name === ""}
+                      onCheckedChange={() => setCategory({ name: "", id: "" })}
+                    />
+                    <Label htmlFor="all-categories">All Categories</Label>
+                  </div>
+                  {cats.map((cat) => (
+                    <div
+                      key={cat.id + "dfkhvjk,"}
+                      className="flex items-center space-x-2"
+                    >
+                      <Checkbox
+                        id={cat.name}
+                        checked={category.id === cat.id}
+                        onCheckedChange={() =>
+                          setCategory(
+                            category.id === cat.id ? { name: "", id: "" } : cat
+                          )
+                        }
+                      />
+                      <Label htmlFor={cat.name}>{cat.name}</Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <Separator />
+
               {/* Price Range */}
               <div>
-                <label className="text-sm font-medium mb-3 block">
+                <Label className="text-sm font-medium mb-3 block">
                   Price Range: ${priceRange[0]} - ${priceRange[1]}
-                </label>
+                </Label>
                 <Slider
                   value={priceRange}
-                  onValueChange={(value) => setPriceRange([value[0], value[1]])}
-                  max={1000}
+                  onValueChange={setPriceRange}
+                  max={100000}
                   step={10}
                   className="w-full"
                 />
@@ -184,17 +254,9 @@ export default function CategoryPage({
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Link href="/categories">
-                  <Button variant="ghost" size="sm">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Categories
-                  </Button>
-                </Link>
-              </div>
-              <h1 className="text-2xl font-bold">{categoryName}</h1>
+              <h1 className="text-2xl font-bold">Products</h1>
               <p className="text-muted-foreground">
-                Showing {filteredProducts.length} products
+                Showing {filteredProducts.length} of {products.length} products
               </p>
             </div>
 
@@ -251,8 +313,24 @@ export default function CategoryPage({
           </div>
 
           {/* Active Filters */}
-          {(priceRange[0] > 0 || priceRange[1] < 1000 || rating > 0) && (
+          {(category.name.length > 0 ||
+            searchQuery ||
+            priceRange[0] > 0 ||
+            priceRange[1] < 1000 ||
+            rating > 0) && (
             <div className="flex flex-wrap gap-2 mb-6">
+              {category && (
+                <Badge
+                  variant="secondary"
+                  className="cursor-pointer"
+                  onClick={() => setCategory({ name: "", id: "" })}
+                >
+                  Category: {category.name} ×
+                </Badge>
+              )}
+              {searchQuery && (
+                <Badge variant="secondary">{`Search: ${searchQuery}`}</Badge>
+              )}
               {(priceRange[0] > 0 || priceRange[1] < 1000) && (
                 <Badge
                   variant="secondary"
@@ -279,7 +357,7 @@ export default function CategoryPage({
             <Card>
               <CardContent className="text-center py-12">
                 <p className="text-muted-foreground mb-4">
-                  No products found in this category.
+                  No products found matching your criteria.
                 </p>
                 <Button onClick={clearFilters}>Clear all filters</Button>
               </CardContent>
@@ -293,9 +371,9 @@ export default function CategoryPage({
                   : "space-y-4"
               }
             >
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product, i) => (
                 <motion.div
-                  key={product.xata_id + "dfkxjnvkfj"}
+                  key={product.xata_id + generateRandom(i * 1.0, 100.0)}
                   layout
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -311,4 +389,6 @@ export default function CategoryPage({
       </div>
     </div>
   );
-}
+};
+
+export default ProductsComp;

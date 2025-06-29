@@ -1,42 +1,53 @@
-'use client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from 'firebase/auth';
-import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Checkbox } from '@/components/ui/checkbox';
-import { auth, googleProvider, facebookProvider } from '@/lib/firebase';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  updateProfile,
+} from "firebase/auth";
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
+import { auth, googleProvider, facebookProvider } from "@/lib/firebase";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     agreeToTerms: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error("Passwords do not match");
       return;
     }
 
     if (!formData.agreeToTerms) {
-      toast.error('Please agree to the terms and conditions');
+      toast.error("Please agree to the terms and conditions");
       return;
     }
 
@@ -48,15 +59,15 @@ export default function RegisterPage() {
         formData.email,
         formData.password
       );
-      
+
       await updateProfile(userCredential.user, {
         displayName: formData.name,
       });
 
-      toast.success('Account created successfully!');
-      router.push('/');
+      toast.success("Account created successfully!");
+      router.push("/");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create account');
+      toast.error(error.message ?? "Failed to create account");
     } finally {
       setIsLoading(false);
     }
@@ -66,10 +77,11 @@ export default function RegisterPage() {
     setIsLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
-      toast.success('Account created successfully!');
-      router.push('/');
+      toast.success("Account created successfully!");
+      router.push("/");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to sign up with Google');
+      console.log(error);
+      toast.error(error.message ?? "Failed to sign up with Google");
     } finally {
       setIsLoading(false);
     }
@@ -79,17 +91,17 @@ export default function RegisterPage() {
     setIsLoading(true);
     try {
       await signInWithPopup(auth, facebookProvider);
-      toast.success('Account created successfully!');
-      router.push('/');
+      toast.success("Account created successfully!");
+      router.push("/");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to sign up with Facebook');
+      toast.error(error.message ?? "Failed to sign up with Facebook");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-primary/5 to-secondary/5 px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -106,7 +118,9 @@ export default function RegisterPage() {
                 </Button>
               </Link>
             </div>
-            <CardTitle className="text-2xl font-bold text-center">Create account</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">
+              Create account
+            </CardTitle>
             <CardDescription className="text-center">
               Join us today and start your shopping journey
             </CardDescription>
@@ -123,7 +137,9 @@ export default function RegisterPage() {
                     placeholder="Enter your full name"
                     className="pl-10"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -139,7 +155,9 @@ export default function RegisterPage() {
                     placeholder="Enter your email"
                     className="pl-10"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -151,11 +169,13 @@ export default function RegisterPage() {
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     className="pl-10 pr-10"
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
                     required
                   />
                   <button
@@ -182,7 +202,12 @@ export default function RegisterPage() {
                     placeholder="Confirm your password"
                     className="pl-10"
                     value={formData.confirmPassword}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        confirmPassword: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
@@ -192,24 +217,30 @@ export default function RegisterPage() {
                 <Checkbox
                   id="terms"
                   checked={formData.agreeToTerms}
-                  onCheckedChange={(checked) => 
-                    setFormData({ ...formData, agreeToTerms: checked as boolean })
+                  onCheckedChange={(checked) =>
+                    setFormData({
+                      ...formData,
+                      agreeToTerms: checked as boolean,
+                    })
                   }
                 />
                 <Label htmlFor="terms" className="text-sm">
-                  I agree to the{' '}
+                  I agree to the{" "}
                   <Link href="/terms" className="text-primary hover:underline">
                     Terms & Conditions
-                  </Link>{' '}
-                  and{' '}
-                  <Link href="/privacy" className="text-primary hover:underline">
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href="/privacy"
+                    className="text-primary hover:underline"
+                  >
                     Privacy Policy
                   </Link>
                 </Label>
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Creating account...' : 'Create Account'}
+                {isLoading ? "Creating account..." : "Create Account"}
               </Button>
             </form>
 
@@ -218,7 +249,9 @@ export default function RegisterPage() {
                 <Separator />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
               </div>
             </div>
 
@@ -240,7 +273,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="text-center text-sm">
-              Already have an account?{' '}
+              Already have an account?{" "}
               <Link href="/auth/login" className="text-primary hover:underline">
                 Sign in
               </Link>

@@ -1,21 +1,7 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { User } from 'firebase/auth';
-
-export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-  rating: number;
-  reviewCount: number;
-  description: string;
-  slug: string;
-  featured?: boolean;
-  sale?: boolean;
-  originalPrice?: number;
-}
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { User } from "firebase/auth";
+import { Product } from "./type";
 
 export interface CartItem extends Product {
   quantity: number;
@@ -40,12 +26,12 @@ interface CartState {
 }
 
 interface FilterState {
-  category: string;
+  category: { name: string; id: string };
   priceRange: [number, number];
   rating: number;
   sortBy: string;
   searchQuery: string;
-  setCategory: (category: string) => void;
+  setCategory: (category: { name: string; id: string }) => void;
   setPriceRange: (range: [number, number]) => void;
   setRating: (rating: number) => void;
   setSortBy: (sortBy: string) => void;
@@ -67,11 +53,13 @@ export const useCartStore = create<CartState>()(
       items: [],
       addItem: (product, quantity = 1) =>
         set((state) => {
-          const existingItem = state.items.find((item) => item.id === product.id);
+          const existingItem = state.items.find(
+            (item) => item.xata_id === product.xata_id
+          );
           if (existingItem) {
             return {
               items: state.items.map((item) =>
-                item.id === product.id
+                item.xata_id === product.xata_id
                   ? { ...item, quantity: item.quantity + quantity }
                   : item
               ),
@@ -83,31 +71,35 @@ export const useCartStore = create<CartState>()(
         }),
       removeItem: (productId) =>
         set((state) => ({
-          items: state.items.filter((item) => item.id !== productId),
+          items: state.items.filter((item) => item.xata_id !== productId),
         })),
       updateQuantity: (productId, quantity) =>
         set((state) => ({
           items: state.items.map((item) =>
-            item.id === productId ? { ...item, quantity } : item
+            item.xata_id === productId ? { ...item, quantity } : item
           ),
         })),
       clearCart: () => set({ items: [] }),
-      getTotalItems: () => get().items.reduce((total, item) => total + item.quantity, 0),
+      getTotalItems: () =>
+        get().items.reduce((total, item) => total + item.quantity, 0),
       getTotalPrice: () =>
-        get().items.reduce((total, item) => total + item.price * item.quantity, 0),
+        get().items.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0
+        ),
     }),
     {
-      name: 'cart-storage',
+      name: "cart-storage",
     }
   )
 );
 
 export const useFilterStore = create<FilterState>((set) => ({
-  category: '',
-  priceRange: [0, 1000],
+  category: { name: "", id: "" },
+  priceRange: [0 as number, 100000 as number],
   rating: 0,
-  sortBy: 'featured',
-  searchQuery: '',
+  sortBy: "featured",
+  searchQuery: "",
   setCategory: (category) => set({ category }),
   setPriceRange: (priceRange) => set({ priceRange }),
   setRating: (rating) => set({ rating }),
@@ -115,10 +107,10 @@ export const useFilterStore = create<FilterState>((set) => ({
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   clearFilters: () =>
     set({
-      category: '',
-      priceRange: [0, 1000],
+      category: { name: "", id: "" },
+      priceRange: [0, 100000],
       rating: 0,
-      sortBy: 'featured',
-      searchQuery: '',
+      sortBy: "featured",
+      searchQuery: "",
     }),
 }));

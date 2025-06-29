@@ -13,7 +13,7 @@ interface CartItemProps {
   item: CartItemType;
 }
 
-export function CartItem({ item }: CartItemProps) {
+export function CartItem({ item }: Readonly<CartItemProps>) {
   const { updateQuantity, removeItem } = useCartStore();
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
@@ -23,7 +23,7 @@ export function CartItem({ item }: CartItemProps) {
     setIsLoading("quantity");
     // Simulate API call
     setTimeout(() => {
-      updateQuantity(item.id, newQuantity);
+      updateQuantity(item.xata_id, newQuantity);
       setIsLoading(null);
     }, 300);
   };
@@ -32,7 +32,7 @@ export function CartItem({ item }: CartItemProps) {
     setIsLoading("remove");
     // Simulate API call
     setTimeout(() => {
-      removeItem(item.id);
+      removeItem(item.xata_id);
       toast.success("Item removed from cart");
       setIsLoading(null);
     }, 300);
@@ -49,7 +49,7 @@ export function CartItem({ item }: CartItemProps) {
       {/* Product Image */}
       <div className="relative w-full sm:w-24 h-48 sm:h-24 rounded-lg overflow-hidden shrink-0">
         <Image
-          src={item.image}
+          src={item.images[0]}
           alt={item.name}
           fill
           className="object-cover"
@@ -61,7 +61,9 @@ export function CartItem({ item }: CartItemProps) {
         <div className="flex justify-between items-start">
           <div>
             <h3 className="font-semibold">{item.name}</h3>
-            <p className="text-sm text-muted-foreground">{item.category}</p>
+            <p className="text-sm text-muted-foreground">
+              {item.category.name}
+            </p>
           </div>
           <Button
             variant="ghost"

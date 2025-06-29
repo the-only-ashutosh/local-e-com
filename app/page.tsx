@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import React from "react";
 import { ArrowRight, Truck, Shield, RefreshCw, Award } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -138,7 +139,10 @@ export default function HomePage() {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {featuredProducts.map((product) => (
-            <motion.div key={product.id} variants={itemVariants}>
+            <motion.div
+              key={product.xata_id + "khbsks"}
+              variants={itemVariants}
+            >
               <ProductCard product={product} />
             </motion.div>
           ))}
@@ -183,7 +187,10 @@ export default function HomePage() {
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
             >
               {saleProducts.map((product) => (
-                <motion.div key={product.id} variants={itemVariants}>
+                <motion.div
+                  key={product.xata_id + "dgjskskhbw"}
+                  variants={itemVariants}
+                >
                   <ProductCard product={product} />
                 </motion.div>
               ))}

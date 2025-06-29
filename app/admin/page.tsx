@@ -165,7 +165,9 @@ function AdminContent() {
                             {stat.title}
                           </p>
                           <p className="text-2xl font-bold">{stat.value}</p>
-                          <p className="text-xs text-green-600">{stat.change}</p>
+                          <p className="text-xs text-green-600">
+                            {stat.change}
+                          </p>
                         </div>
                         <stat.icon className={`h-8 w-8 ${stat.color}`} />
                       </div>
@@ -194,7 +196,9 @@ function AdminContent() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">{formatPrice(order.total)}</p>
+                        <p className="font-medium">
+                          {formatPrice(order.total)}
+                        </p>
                         <Badge className={getStatusColor(order.status)}>
                           {order.status}
                         </Badge>
@@ -244,12 +248,12 @@ function AdminContent() {
                   </TableHeader>
                   <TableBody>
                     {filteredProducts.map((product) => (
-                      <TableRow key={product.id}>
+                      <TableRow key={product.xata_id + "dfkbv"}>
                         <TableCell>
                           <div className="flex items-center space-x-3">
                             <div className="relative w-10 h-10 rounded-lg overflow-hidden">
                               <Image
-                                src={product.image}
+                                src={product.images[0]}
                                 alt={product.name}
                                 fill
                                 className="object-cover"
@@ -258,19 +262,20 @@ function AdminContent() {
                             <div>
                               <p className="font-medium">{product.name}</p>
                               <p className="text-sm text-muted-foreground">
-                                ID: {product.id}
+                                ID: {product.xata_id}
                               </p>
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell>{product.category}</TableCell>
+                        <TableCell>{product.category.name}</TableCell>
                         <TableCell>{formatPrice(product.price)}</TableCell>
-                        <TableCell>{product.rating}/5</TableCell>
+                        <TableCell>
+                          {Math.floor(product.totalStar / product.reviewCount)}
+                          /5
+                        </TableCell>
                         <TableCell>
                           <Badge
-                            variant={
-                              product.featured ? "default" : "secondary"
-                            }
+                            variant={product.featured ? "default" : "secondary"}
                           >
                             {product.featured ? "Featured" : "Active"}
                           </Badge>

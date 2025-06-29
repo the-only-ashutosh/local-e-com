@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, use } from "react";
 import { motion } from "framer-motion";
 import { User, Package, Heart, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,7 +57,7 @@ function AccountContent() {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Avatar className="h-16 w-16">
-                  <AvatarImage src={user?.photoURL || ""} />
+                  <AvatarImage src={user?.photoURL ?? ""} />
                   <AvatarFallback>
                     {user?.displayName ? getInitials(user.displayName) : "U"}
                   </AvatarFallback>
@@ -120,7 +120,11 @@ function AccountContent() {
                   </div>
                   <div>
                     <label className="text-sm font-medium">Phone</label>
-                    <p className="text-muted-foreground">Not provided</p>
+                    <p className="text-muted-foreground">{user?.phoneNumber}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Role</label>
+                    <p className="text-muted-foreground">{"Not Assigned"}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Member Since</label>
