@@ -34,6 +34,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AuthGuard } from "@/components/auth-guard";
+import { CheckoutProgressBar } from "@/components/checkout-progress-bar";
+import { DynamicCartSummary } from "@/components/dynamic-cart-summary";
+import { TrustBadgesStrip } from "@/components/trust-badges-strip";
 import { useAuth } from "@/hooks/use-auth";
 import { useCartStore } from "@/lib/store";
 import { formatPrice } from "@/lib/utils";
@@ -65,12 +68,6 @@ const paymentSchema = z.object({
 type AddressFormData = z.infer<typeof addressSchema>;
 type PaymentFormData = z.infer<typeof paymentSchema>;
 
-const steps = [
-  { id: 1, title: "Shipping Address", icon: MapPin },
-  { id: 2, title: "Payment", icon: CreditCard },
-  { id: 3, title: "Review Order", icon: Package },
-];
-
 function CheckoutContent() {
   const router = useRouter();
   const { user } = useAuth();
@@ -94,9 +91,6 @@ function CheckoutContent() {
   });
 
   const subtotal = getTotalPrice();
-  const shipping = subtotal > 50 ? 0 : 9.99;
-  const tax = subtotal * 0.08;
-  const total = subtotal + shipping + tax;
 
   if (items.length === 0) {
     return (
@@ -142,488 +136,429 @@ function CheckoutContent() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Progress Steps */}
-      <div className="mb-8">
-        <div className="flex items-center justify-center space-x-8">
-          {steps.map((step, index) => (
-            <div key={step.id} className="flex items-center">
-              <div
-                className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                  currentStep >= step.id
-                    ? "bg-primary border-primary text-primary-foreground"
-                    : "border-muted-foreground text-muted-foreground"
-                }`}
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        {/* Progress Bar */}
+        <CheckoutProgressBar currentStep={currentStep} className="mb-8" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            {/* Step 1: Shipping Address */}
+            {currentStep === 1 && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
               >
-                <step.icon className="h-5 w-5" />
-              </div>
-              <span
-                className={`ml-2 text-sm font-medium ${
-                  currentStep >= step.id
-                    ? "text-foreground"
-                    : "text-muted-foreground"
-                }`}
-              >
-                {step.title}
-              </span>
-              {index < steps.length - 1 && (
-                <div
-                  className={`w-16 h-0.5 ml-4 ${
-                    currentStep > step.id ? "bg-primary" : "bg-muted"
-                  }`}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="lg:col-span-2">
-          {/* Step 1: Shipping Address */}
-          {currentStep === 1 && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Shipping Address</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Form {...addressForm}>
-                    <form
-                      onSubmit={addressForm.handleSubmit(handleAddressSubmit)}
-                      className="space-y-4"
-                    >
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
-                          control={addressForm.control}
-                          name="firstName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>First Name</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={addressForm.control}
-                          name="lastName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Last Name</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
-                          control={addressForm.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Email</FormLabel>
-                              <FormControl>
-                                <Input type="email" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={addressForm.control}
-                          name="phone"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Phone</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <FormField
-                        control={addressForm.control}
-                        name="address"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Address</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormField
-                          control={addressForm.control}
-                          name="city"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>City</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={addressForm.control}
-                          name="state"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>State</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={addressForm.control}
-                          name="zipCode"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>ZIP Code</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <FormField
-                        control={addressForm.control}
-                        name="country"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Country</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select a country" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="us">
-                                  United States
-                                </SelectItem>
-                                <SelectItem value="ca">Canada</SelectItem>
-                                <SelectItem value="uk">
-                                  United Kingdom
-                                </SelectItem>
-                                <SelectItem value="au">Australia</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <div className="flex justify-between pt-4">
-                        <Button variant="outline" asChild>
-                          <Link href="/cart">
-                            <ArrowLeft className="h-4 w-4 mr-2" />
-                            Back to Cart
-                          </Link>
-                        </Button>
-                        <Button type="submit">
-                          Continue to Payment
-                          <ArrowRight className="h-4 w-4 ml-2" />
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-
-          {/* Step 2: Payment */}
-          {currentStep === 2 && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Payment Information</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Form {...paymentForm}>
-                    <form
-                      onSubmit={paymentForm.handleSubmit(handlePaymentSubmit)}
-                      className="space-y-4"
-                    >
-                      <FormField
-                        control={paymentForm.control}
-                        name="cardNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Card Number</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="1234 5678 9012 3456"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={paymentForm.control}
-                          name="expiryDate"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Expiry Date</FormLabel>
-                              <FormControl>
-                                <Input placeholder="MM/YY" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={paymentForm.control}
-                          name="cvv"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>CVV</FormLabel>
-                              <FormControl>
-                                <Input placeholder="123" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <FormField
-                        control={paymentForm.control}
-                        name="cardName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Name on Card</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <div className="flex justify-between pt-4">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setCurrentStep(1)}
-                        >
-                          <ArrowLeft className="h-4 w-4 mr-2" />
-                          Back to Address
-                        </Button>
-                        <Button type="submit">
-                          Review Order
-                          <ArrowRight className="h-4 w-4 ml-2" />
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-
-          {/* Step 3: Review Order */}
-          {currentStep === 3 && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-6"
-            >
-              {/* Shipping Address Review */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Shipping Address</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {addressData && (
-                    <div className="space-y-2">
-                      <p className="font-medium">
-                        {addressData.firstName} {addressData.lastName}
-                      </p>
-                      <p>{addressData.address}</p>
-                      <p>
-                        {addressData.city}, {addressData.state}{" "}
-                        {addressData.zipCode}
-                      </p>
-                      <p>{addressData.country}</p>
-                      <p>{addressData.email}</p>
-                      <p>{addressData.phone}</p>
-                    </div>
-                  )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-4"
-                    onClick={() => setCurrentStep(1)}
-                  >
-                    Edit Address
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Payment Method Review */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Payment Method</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {paymentData && (
-                    <div className="space-y-2">
-                      <p className="font-medium">
-                        **** **** **** {paymentData.cardNumber.slice(-4)}
-                      </p>
-                      <p>Expires {paymentData.expiryDate}</p>
-                      <p>{paymentData.cardName}</p>
-                    </div>
-                  )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-4"
-                    onClick={() => setCurrentStep(2)}
-                  >
-                    Edit Payment
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Order Items */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Order Items</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {items.map((item) => (
-                      <div
-                        key={item.xata_id}
-                        className="flex items-center space-x-4"
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MapPin className="h-5 w-5" />
+                      Shipping Address
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Form {...addressForm}>
+                      <form
+                        onSubmit={addressForm.handleSubmit(handleAddressSubmit)}
+                        className="space-y-4"
                       >
-                        <div className="relative w-16 h-16 rounded-lg overflow-hidden">
-                          <Image
-                            src={item.images[0]}
-                            alt={item.name}
-                            fill
-                            className="object-cover"
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={addressForm.control}
+                            name="firstName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>First Name</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={addressForm.control}
+                            name="lastName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Last Name</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
                           />
                         </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium">{item.name}</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Quantity: {item.quantity}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={addressForm.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                  <Input type="email" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={addressForm.control}
+                            name="phone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Phone</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={addressForm.control}
+                          name="address"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Address</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <FormField
+                            control={addressForm.control}
+                            name="city"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>City</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={addressForm.control}
+                            name="state"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>State</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={addressForm.control}
+                            name="zipCode"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>ZIP Code</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={addressForm.control}
+                          name="country"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Country</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select a country" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="us">
+                                    United States
+                                  </SelectItem>
+                                  <SelectItem value="ca">Canada</SelectItem>
+                                  <SelectItem value="uk">
+                                    United Kingdom
+                                  </SelectItem>
+                                  <SelectItem value="au">Australia</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="flex justify-between pt-4">
+                          <Button variant="outline" asChild>
+                            <Link href="/cart">
+                              <ArrowLeft className="h-4 w-4 mr-2" />
+                              Back to Cart
+                            </Link>
+                          </Button>
+                          <Button type="submit">
+                            Continue to Payment
+                            <ArrowRight className="h-4 w-4 ml-2" />
+                          </Button>
+                        </div>
+                      </form>
+                    </Form>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* Step 2: Payment */}
+            {currentStep === 2 && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+              >
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <CreditCard className="h-5 w-5" />
+                      Payment Information
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Form {...paymentForm}>
+                      <form
+                        onSubmit={paymentForm.handleSubmit(handlePaymentSubmit)}
+                        className="space-y-4"
+                      >
+                        <FormField
+                          control={paymentForm.control}
+                          name="cardNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Card Number</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="1234 5678 9012 3456"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={paymentForm.control}
+                            name="expiryDate"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Expiry Date</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="MM/YY" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={paymentForm.control}
+                            name="cvv"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>CVV</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="123" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={paymentForm.control}
+                          name="cardName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Name on Card</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="flex justify-between pt-4">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setCurrentStep(1)}
+                          >
+                            <ArrowLeft className="h-4 w-4 mr-2" />
+                            Back to Address
+                          </Button>
+                          <Button type="submit">
+                            Review Order
+                            <ArrowRight className="h-4 w-4 ml-2" />
+                          </Button>
+                        </div>
+                      </form>
+                    </Form>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* Step 3: Review Order */}
+            {currentStep === 3 && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="space-y-6"
+              >
+                {/* Shipping Address Review */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Shipping Address</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {addressData && (
+                      <div className="space-y-2">
+                        <p className="font-medium">
+                          {addressData.firstName} {addressData.lastName}
+                        </p>
+                        <p>{addressData.address}</p>
+                        <p>
+                          {addressData.city}, {addressData.state}{" "}
+                          {addressData.zipCode}
+                        </p>
+                        <p>{addressData.country}</p>
+                        <p>{addressData.email}</p>
+                        <p>{addressData.phone}</p>
+                      </div>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-4"
+                      onClick={() => setCurrentStep(1)}
+                    >
+                      Edit Address
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Payment Method Review */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Payment Method</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {paymentData && (
+                      <div className="space-y-2">
+                        <p className="font-medium">
+                          **** **** **** {paymentData.cardNumber.slice(-4)}
+                        </p>
+                        <p>Expires {paymentData.expiryDate}</p>
+                        <p>{paymentData.cardName}</p>
+                      </div>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-4"
+                      onClick={() => setCurrentStep(2)}
+                    >
+                      Edit Payment
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Order Items */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Order Items</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {items.map((item) => (
+                        <div
+                          key={item.xata_id}
+                          className="flex items-center space-x-4"
+                        >
+                          <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                            <Image
+                              src={item.images[0]}
+                              alt={item.name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-medium">{item.name}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Quantity: {item.quantity}
+                            </p>
+                          </div>
+                          <p className="font-medium">
+                            {formatPrice(item.price * item.quantity)}
                           </p>
                         </div>
-                        <p className="font-medium">
-                          {formatPrice(item.price * item.quantity)}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
 
-              <div className="flex justify-between">
-                <Button variant="outline" onClick={() => setCurrentStep(2)}>
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Payment
-                </Button>
-                <Button
-                  onClick={handlePlaceOrder}
-                  disabled={isProcessing}
-                  size="lg"
-                >
-                  {isProcessing
-                    ? "Processing..."
-                    : `Place Order - ${formatPrice(total)}`}
-                </Button>
-              </div>
-            </motion.div>
-          )}
-        </div>
-
-        {/* Order Summary Sidebar */}
-        <div className="lg:col-span-1">
-          <Card className="sticky top-4">
-            <CardHeader>
-              <CardTitle>Order Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span>
-                    Subtotal (
-                    {items.reduce((acc, item) => acc + item.quantity, 0)} items)
-                  </span>
-                  <span>{formatPrice(subtotal)}</span>
+                  <Button variant="outline" onClick={() => setCurrentStep(2)}>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back to Payment
+                  </Button>
+                  <Button
+                    onClick={handlePlaceOrder}
+                    disabled={isProcessing}
+                    size="lg"
+                  >
+                    {isProcessing
+                      ? "Processing..."
+                      : `Place Order`}
+                  </Button>
                 </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span>
-                    {shipping === 0 ? (
-                      <Badge variant="secondary">Free</Badge>
-                    ) : (
-                      formatPrice(shipping)
-                    )}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax</span>
-                  <span>{formatPrice(tax)}</span>
-                </div>
-              </div>
+              </motion.div>
+            )}
+          </div>
 
-              <Separator />
-
-              <div className="flex justify-between text-lg font-semibold">
-                <span>Total</span>
-                <span>{formatPrice(total)}</span>
-              </div>
-
-              {shipping > 0 && (
-                <p className="text-sm text-muted-foreground">
-                  Add {formatPrice(50 - subtotal)} more for free shipping
-                </p>
-              )}
-            </CardContent>
-          </Card>
+          {/* Order Summary Sidebar */}
+          <div className="lg:col-span-1">
+            <DynamicCartSummary 
+              isFloating={true}
+              showCoupon={currentStep < 3}
+              showShipping={currentStep < 3}
+            />
+          </div>
         </div>
       </div>
+
+      {/* Trust Badges */}
+      <TrustBadgesStrip variant="sticky" />
     </div>
   );
 }

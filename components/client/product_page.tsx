@@ -1,6 +1,6 @@
 "use client";
 
-import { JSX, useState } from "react";
+import { JSX, useState, useEffect } from "react";
 import Image from "next/image";
 import {
   Star,
@@ -21,6 +21,7 @@ import { formatPrice, calculateDiscount } from "@/lib/utils";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { ProductPage } from "@/lib/type";
+import { useRecentlyViewed } from "@/components/recently-viewed-products";
 
 const ProductPageComp = ({
   data,
@@ -38,6 +39,12 @@ const ProductPageComp = ({
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const { addItem } = useCartStore();
+  const { addToRecentlyViewed } = useRecentlyViewed();
+
+  // Track this product as recently viewed
+  useEffect(() => {
+    addToRecentlyViewed(product);
+  }, [product, addToRecentlyViewed]);
 
   const discount =
     product.sale && product.originalPrice
@@ -53,13 +60,16 @@ const ProductPageComp = ({
     setIsWishlisted(!isWishlisted);
     toast.success(isWishlisted ? "Removed from wishlist" : "Added to wishlist");
   };
+  
   const features = [
     { icon: Truck, text: "Free shipping on orders over $50" },
     { icon: Shield, text: "2-year warranty included" },
     { icon: RefreshCw, text: "30-day return policy" },
   ];
+  
   const images =
     "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg";
+    
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb */}
